@@ -11,12 +11,15 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
+    
     - name: Set up JDK 11
       uses: actions/setup-java@v1
       with:
         java-version: 11
+    
     - name: Build native with Maven
       run: mvn -B package
+    
     - name: Upload jar for next job
       uses: actions/upload-artifact@v1
       with:
@@ -33,18 +36,24 @@ jobs:
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
+      
       - name: Download Jar from previous job
         uses: actions/download-artifact@v1
         with:
           name: target
+      
       - name: Build Docker Image
         run: docker build -t items .
+      
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+      
       - name: Change image name to point to Heroku registry
         run: docker tag items registry.heroku.com/$HEROKU_APP/web
+      
       - name: Login in Heroku container registry
         run: heroku container:login
+      
       - name: Push image to Heroku Registry
         run: docker push registry.heroku.com/$HEROKU_APP/web
 
@@ -58,7 +67,9 @@ jobs:
     steps:
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+      
       - name: Login in Heroku
         run: heroku container:login
+      
       - name: Deploy to Heroku
         run: heroku container:release web
